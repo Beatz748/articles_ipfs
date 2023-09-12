@@ -1,0 +1,29 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+
+  migration-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: migration-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: "mongodb://root:qwerty@mongodb:27017"
+      MONGO_DB_NAME: "papers"
+      MONGO_COLL_NAME: "articles"
+      HTTP_SERVER_PORT: "8080"
+      PINATA_API_KEY: "34c6614a95d2e80c4b6d"
+      PINATA_API_SECRET: "d2e1818e396fe2e7f74f19f58bb15370f92a392a8f94039f29d072d7182b9652"
